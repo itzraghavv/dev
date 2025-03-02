@@ -23,6 +23,33 @@ jobs:
           chmod 600 ~/.ssh/deploy_key
           echo -e "Host ec2\n\tHostName $SSH_HOST\n\tUser $SSH_USER\n\tIdentityFile ~/.ssh/deploy_key\n\tStrictHostKeyChecking no" > ~/.ssh/config
       
+      - name: Install PM2 and setup directory
+        run: |
+          ssh ec2 '
+            # Install Node.js and npm if not installed (for Ubuntu)
+            if ! command -v node &> /dev/null; then
+              curl -fsSL https://deb.nodesource.com/setup_16.x | sudo -E bash -
+              sudo apt-get install -y nodejs
+            fi
+
+            # Install PM2 globally if not installed
+            if ! command -v pm2 &> /dev/null; then
+              sudo npm install -g pm2
+            fi
+
+            # Create app directory if it doesn't exist
+            mkdir -p ~/dev/simple-node-app
+          '
+      
       - name: Deploy to EC2
         run: |
-          ssh ec2 'cd ~/simple-node-app && git pull origin main && npm install && pm2 restart index.js || pm2 start index.js' 
+          # Copy current repository files to EC2
+          scp -r ./* ec2:~/dev/simple-node-app/
+          
+          # Install dependencies and start/restart the application
+          ssh ec2 '
+            cd ~/dev/simple-node-app && 
+            npm install && 
+            pm2 describe index || pm2 start index.js --name index
+            pm2 restart index
+          ' 
