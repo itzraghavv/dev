@@ -52,3 +52,4 @@ The application automatically deploys to EC2 when changes are pushed to the main
 2. Pulls the latest changes
 3. Installs dependencies
 4. Restarts the application using PM2 
+do something
