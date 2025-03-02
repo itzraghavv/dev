@@ -37,18 +37,18 @@ jobs:
               sudo npm install -g pm2
             fi
 
-            # Create app directory if it doesn't exist
+            # Create dev directory if it doesn't exist
             mkdir -p ~/dev
           '
       
       - name: Deploy to EC2
         run: |
           # Copy current repository files to EC2
-          scp -r ./* ec2:~/dev/simple-node-app/
+          scp -r ./* ec2:~/dev/
           
           # Install dependencies and start/restart the application
           ssh ec2 '
-            cd ~/dev/simple-node-app && 
+            cd ~/dev && 
             npm install && 
             pm2 describe index || pm2 start index.js --name index
             pm2 restart index
