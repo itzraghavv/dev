@@ -38,7 +38,7 @@ jobs:
             fi
 
             # Create app directory if it doesn't exist
-            mkdir -p ~/dev/simple-node-app
+            mkdir -p ~/dev
           '
       
       - name: Deploy to EC2
